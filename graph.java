@@ -3,8 +3,8 @@ import java.util.*;
 
 
 class graph{
- boolean directed;
- boolean weighted;
+ private boolean directed;
+ private boolean weighted;
  
 private Map<Character, Map<Character, Integer>> adjlist = new HashMap<>();
 
