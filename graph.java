@@ -3,7 +3,8 @@ import java.util.*;
 
 
 class graph{
- Boolean directed;
+ boolean directed;
+ 
 private Map<Character, Map<Character, Integer>> adjlist = new HashMap<>();
 
 
@@ -34,14 +35,16 @@ directed = d;
 
   
   public void addVertix(Character a){
-    adjlist.putIfAbsent(a, new ArrayList<>()); 
+ adjlist.putIfAbsent(a, new HashMap<>());
   }
 
+ 
   public void deleteVertix(Character a){
     
-  for (List<Character> list : adjlist.values()) {
-      list.remove(a)    ;
-    }    
+  for (Map<Character, Integer> neighbors : adjlist.values()) {
+    neighbors.remove(a);
+   }
+  
     adjlist.remove(a);  
   }
 
@@ -84,11 +87,12 @@ public Set<Character> getVertices() {
   
 public List<Character> getInNeighbors(Character a){
   List<Character> result = new ArrayList<>();
-for (Map.Entry<Character, List<Character>> entry : adjlist.entrySet()) {
-    if (entry.getValue().contains(a)) {
+for (Map.Entry<Character, Map<Character, Integer>> entry : adjlist.entrySet()) {
+    if (entry.getValue().containsKey(a)) {
         result.add(entry.getKey());
     }
 }
+
   
       
   return result;
@@ -99,7 +103,7 @@ return adjlist.containsKey(a);
 }
 
 public boolean hasEdge(Character a, Character b){
-return adjlist.containsKey(a) && adjlist.get(a).contains(b);
+return adjlist.containsKey(a) && adjlist.get(a).containsKey(b);
 }
 
 
@@ -111,11 +115,10 @@ public int getInDegree(Character a) {
 
 int result = 0;
   
-  for (List<Character> list : adjlist.values()) {
-      if( list.contains(a)){
-    result++;
-      }
-    }    
+  for (Map<Character, Integer> neighbors : adjlist.values()) {
+    if (neighbors.containsKey(a)) result++;
+}
+  
 
   return result;
 }
@@ -133,15 +136,17 @@ if (adjlist.isEmpty()){
 }
   int sum=0;
 if(directed){
-  for (List<Character> list : adjlist.values()) {
-    sum += list.size();
+ for (Map<Character, Integer> neighbors : adjlist.values()) {
+   sum += neighbors.size();
 }
+
 return sum;
 }else{
 
-for (List<Character> list : adjlist.values()) {
-   sum += list.size();
+for (Map<Character, Integer> neighbors : adjlist.values()) {
+   sum += neighbors.size();
 }
+
 return sum /2; 
 
 
@@ -165,7 +170,7 @@ public boolean isEmpty() {
         maxEdges = V * (V - 1) / 2.0;
     }
 
-    return edges / maxEdges; 
+    return edges /(double) maxEdges; 
 }
 
 public Integer getEdgeWeight(Character a, Character b) {
@@ -173,9 +178,32 @@ public Integer getEdgeWeight(Character a, Character b) {
     return adjlist.get(a).get(b);
 }
 
+ public List<Character> bfs(Character a){
+  List<Character> result = new ArrayList<>();
+  Set<Character> visited = new HashSet<>();
+  Queue<Character> Q = new LinkedList<>();
+
+  Q.add(a);
+  while(!Q.isEmpty()){
+
+   Character node = Q.remove();
+   result.add(node);
+   
+   
+for (Character neighbor : adjlist.get(node).keySet()) {
+
+if(!visited.contains(neighbor)){
+    Q.add(neighbor);
+    visited.add(neighbor);
+}
+
+}   
+
   
+}
+  return result;
 }
   
 
   
-
+}
