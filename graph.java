@@ -4,7 +4,9 @@ import java.util.*;
 
 class graph{
  Boolean directed;
- private Map<Character,List <Character>> adjlist = new HashMap<>();
+private Map<Character, Map<Character, Integer>> adjlist = new HashMap<>();
+
+
 
 public graph(boolean d){
 
@@ -13,23 +15,21 @@ directed = d;
 }
 
   
- public void addEdge(Character a,Character b){
-      addVertix(a);
-     addVertix(b);
-   if(directed){
-  
-   
-       if (!adjlist.get(a).contains(b)) {
-        adjlist.get(a).add(b);
+ public void addEdge(Character a, Character b, int weight) {
+    addVertix(a);
+    addVertix(b);
+
+    if (!adjlist.get(a).containsKey(b)) {
+        adjlist.get(a).put(b, weight);
+    } else {
+        adjlist.get(a).put(b, weight);
     }
-   }else{
 
-        if (!adjlist.get(a).contains(b)) adjlist.get(a).add(b);
-        if (!adjlist.get(b).contains(a)) adjlist.get(b).add(a);
-     
-   }
+    if (!directed) {
+        adjlist.get(b).put(a, weight);
+    }
+}
 
- }
 
 
   
@@ -74,10 +74,11 @@ public Set<Character> getVertices() {
     return adjlist.keySet();
 }
 
-  
-public List<Character> getNeighbors(Character a) {
-    return adjlist.getOrDefault(a, new ArrayList<>());
+  public Set<Character> getNeighbors(Character a) {
+    if (!adjlist.containsKey(a)) return new HashSet<>();
+    return adjlist.get(a).keySet();
 }
+
 
 
   
@@ -167,6 +168,10 @@ public boolean isEmpty() {
     return edges / maxEdges; 
 }
 
+public Integer getEdgeWeight(Character a, Character b) {
+    if (!adjlist.containsKey(a)) return null;
+    return adjlist.get(a).get(b);
+}
 
   
 }
