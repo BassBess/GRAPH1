@@ -4,6 +4,7 @@ import java.util.*;
 
 class graph{
  boolean directed;
+ boolean weighted;
  
 private Map<Character, Map<Character, Integer>> adjlist = new HashMap<>();
 
@@ -12,22 +13,50 @@ private Map<Character, Map<Character, Integer>> adjlist = new HashMap<>();
 public graph(boolean d){
 
 directed = d;
-  
+ weighted = false;
 }
+ public graph(boolean d, boolean w) {
+    directed = d;
+    weighted = w;
+}
+
+ public graph(){
+
+  directed= false;
+  weighted= false;
+ }
 
   
  public void addEdge(Character a, Character b, int weight) {
+    if (!weighted) {
+        throw new IllegalStateException("Unweighted graph can't assign custom weights");
+    }
+
     addVertix(a);
     addVertix(b);
 
     if (!adjlist.get(a).containsKey(b)) {
         adjlist.get(a).put(b, weight);
-    } else {
-        adjlist.get(a).put(b, weight);
     }
 
     if (!directed) {
         adjlist.get(b).put(a, weight);
+    }
+}
+
+public void addEdge(Character a, Character b) {
+    if (weighted) {
+        throw new IllegalStateException("This is a weighted graph; use addEdge(a, b, weight)");
+    }
+    addVertix(a);
+    addVertix(b);
+
+    if (!adjlist.get(a).containsKey(b)) {
+        adjlist.get(a).put(b, 1);
+    }
+
+    if (!directed) {
+        adjlist.get(b).put(a, 1);
     }
 }
 
@@ -178,32 +207,117 @@ public Integer getEdgeWeight(Character a, Character b) {
     return adjlist.get(a).get(b);
 }
 
- public List<Character> bfs(Character a){
-  List<Character> result = new ArrayList<>();
-  Set<Character> visited = new HashSet<>();
-  Queue<Character> Q = new LinkedList<>();
+public List<Character> bfs(Character start){
+    List<Character> result = new ArrayList<>();
+    if (!adjlist.containsKey(start)) return result; 
+    
+    Set<Character> visited = new HashSet<>();
+    Queue<Character> Q = new LinkedList<>();
+    
+    visited.add(start);
+    Q.add(start);  
+    
+    while(!Q.isEmpty()){
+        Character node = Q.remove();
+        result.add(node);
+        if (!adjlist.containsKey(node)) continue;
+        
+        for (Character neighbor : adjlist.get(node).keySet()) {
+            if(!visited.contains(neighbor)){
+                Q.add(neighbor);
+                visited.add(neighbor);
+            }
+        }
+    }
+    return result;
+}
 
-  Q.add(a);
-  while(!Q.isEmpty()){
 
-   Character node = Q.remove();
-   result.add(node);
+ public List<Character> dfs(Character start) {
+    List<Character> result = new ArrayList<>();
+    Set<Character> visited = new HashSet<>();
+
+    if (!adjlist.containsKey(start)) return result; 
+
+    dfsHelper(start, visited, result);
+    return result;
+}
+private void dfsHelper(Character node, Set<Character> visited, List<Character> result) {
+    visited.add(node);
+    result.add(node);
+
+    for (Character neighbor : adjlist.get(node).keySet()) {
+        if (!visited.contains(neighbor)) {
+            dfsHelper(neighbor, visited, result);
+        }
+    }
+}
+public boolean hasPath(Character a, Character b){
+
+List<Character> list = dfs(a);
+ return list.contains(b);
+ 
+}
+
+ public List<Character> shortestPath(Character a , Character b){
+
+
+  if (!hasPath(a,b)){
+   System.out.println(" no path" );
+   return new ArrayList<>();
+  }
    
+List<Character> path = new ArrayList<>();
+   if(!weighted){
+
+    Map<Character, Character> parent = new HashMap<>(); 
+    Set<Character> visited = new HashSet<>();
+    Queue<Character> queue = new LinkedList<>();
+
+    visited.add(a);
+    queue.add(a);
+
+    boolean found = false;
+
+    while (!queue.isEmpty() && !found) {
+        Character node = queue.remove();
+        for (Character neighbor : adjlist.get(node).keySet()) {
+            if (!visited.contains(neighbor)) {
+                visited.add(neighbor);
+                parent.put(neighbor, node);
+                queue.add(neighbor);
+
+                if (neighbor.equals(b)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+    }
+
+
+    Character current = b;
+    while (current != null) {
+        path.add(0, current); 
+        current = parent.get(current);
+    }
+
+    return path;
+
+
+    
+   }else{
+
+
+
+
+
+    
+   }
+
+
    
-for (Character neighbor : adjlist.get(node).keySet()) {
-
-if(!visited.contains(neighbor)){
-    Q.add(neighbor);
-    visited.add(neighbor);
-}
-
-}   
-
+  
   
 }
-  return result;
-}
-  
-
-  
 }
